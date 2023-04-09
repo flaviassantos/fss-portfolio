@@ -115,201 +115,115 @@
                                     <p><img class="rounded" src="static/assets/img/project6/nexus-firewall.png" alt="Nexus Firewall"></p>
 
                                     <h4>Java Gradle Project: Build Jar & Upload to Nexus</h4>
+                                    <p>We will upload a jar file from a Java Gradle project to existing hosted repository on
+                                        Nexus. We need to configure the Gradle tool by giving it credentials on Nexus in order to use the special command
+                                        for pushing the file into the remote repository. We also need to create Nexus user with permissions
+                                        to upload artifact files in certain repositories.</p>
+                                    <ol>
+                                        <li>Create Manually a Local Nexus User</li>
+                                        <p>Create a local user by going to Security->Users on Nexus UI and give it an anonymous role from now.
+                                        We will create a new role for this user on Security->Roles and limit the permissions for it (best practice).
+                                            This is going to be a role to upload a jar file and retrieve information about it, we can choose a
+                                            ´nx-repository-view-maven2-maven-snapshots-*´ type of privilege. Then we assign this role to the user created:</p>
+                                       <div class="alert alert-info" role="alert">Usually you would not create manually a new user on Nexus, but instead you use integrate existing users
+                                            from your company system by using LDAP integration and then give it Nexus permission.</div>
+                                        <p><img class="rounded" src="static/assets/img/project6/nx-role.png" alt="Nexus Role"></p>
+                                        <p><img class="rounded" src="static/assets/img/project6/flavia-user.png" alt="Nexus User"></p>
+
+                                    <li>Configure with Nexus</li>
+
+                                      <p>Added the following code to the <code>build.gradle</code> file:</p>
+                                            <br>
+                                        <div class="codeBlockContent_biex">
+
+<code class="codeBlockLines_e6Vv">
+    <span class="token-line" style="color: rgb(57, 58, 52);">
+        <span class="token plain">
+            <pre>
+            plugins {
+                id 'maven-publish'
+            }
+
+            group 'com.example'
+            version '1.0-SNAPSHOT'
+
+            publishing {
+                publications {
+                    maven(MavenPublication){
+                        artifact("build/libs/my-app-$version"+".jar") {
+                            extension 'jar'
+                        }
+                    }
+                }
+                repositories {
+                    maven {
+                        name 'nexus'
+                        url "http://<nexus-server-url>:8081/repository/maven-releases/"
+                        allowInsecureProtocol = true
+                        credentials {
+                            username project.repoUser
+                            password project.repoPassword
+                        }
+                    }
+                }
+            }</pre>
+        </span>
+    </span>
+</code>
+
+                                        </div>
+
+                                      <p>Replace "<code>nexus-server-url</code>" with the URL of your Nexus server.The
+                                          "<code>your-username</code>" and "<code>your-password</code>" can be added to a "<code>gradle.properties</code>" file
+                                          with the credentials of the user you created on Nexus.</p>
+                                      <p>The we can build the project with the following command: <code>$ ./gradlew build</code>. And then
+                                      publish the jar file to Nexus with the following command: <code>./gradlew publish</code>.
+                                      Verify that the jar file was uploaded to Nexus by navigating to the Nexus web interface/Browse
+                                          and check the "Repository" section in the left sidebar.</p>
+                                        <p><img class="rounded" src="static/assets/img/project6/my-app.png" alt="My app"></p>
+                                    </ol>
+
                                     <h4>Java Maven Project: Build Jar & Upload to Nexus</h4>
+                                    <p>To configure a maven project, you can add the following block of code into your <code>pm.xml</code> and add credentials
+                                    in the <code>.m2</code> folder in your home directory, you should create a file with the following settings bellow:</p>
 
+                                        <code class="codeBlockLines_e6Vv">
+                                            <span class="token-line" style="color: rgb(57, 58, 52);">
+                                                <span class="token plain">
+                                                    $ cd ~/.m2<br>
+                                                    $ vim settings.xml
+                                                </span></span></code>
 
+                                    <p><br><img class="rounded" src="static/assets/img/project6/settings.png" alt="Settings"></p>
+                                    <p>The we can build the project with the following command: <code>$ mvn package</code>. And then
+                                      publish the jar file to Nexus with the following command: <code>$ mvn deploy</code>.
+                                        Verify that the jar file was uploaded to Nexus by navigating to the Nexus web interface/Browse
+                                          and check the "Repository" section in the left sidebar.
+                                    <br><img class="rounded" src="static/assets/img/project6/maven.png" alt="Maven"></p>
 
-
-
-
-
-
-
-                                    <p>It is very easy to create a droplet ( server on DigitalOcean). We are prompt with several options:
-
+                                    <h4>Nexus API</h4>
+                                    <p>To automate your work, you can use the Nexus API in your scripts. Some examples are:</p>
                                     <ol>
-                                    <li>Choose region</li>
-                                        <p>I selected the datacenter closest to me (Frankfurt).
-                                        <p>
-                                            <img class="rounded" src="static/assets/img/project5/choose-region.png" alt="Region">
-                                        </p>
-                                    <li>Choose an image and size</li>
-                                        <p>I selected Ubuntu as the Linux distributions, we can choose Ubuntu.
-                                        And the basic plan offers us the necessary resources on the virtual machine.</p>
-                                        <p>
-                                            <img class="rounded" src="static/assets/img/project5/choose-image.png" alt="Image">
-                                        </p>
-                                    <li>Choose authentication method</li>
-                                        <p>I selected <a href="https://en.wikipedia.org/wiki/Secure_Shell">SSH</a> key to connect
-                                                to the entire DigitalOcean platform.</p>
-                                        <p>SSH key pairs ( Private Key + Public Key) are basically encrypted values of random hashes created by the client
-                                        machine to connect and configure the remote server.</p>
-                                        <p>
-                                            <img class="rounded" src="static/assets/img/project5/choose-auth.png" alt="Auth">
-                                        </p>
-                                        <ul>
-                                            <li>Private Key: should be securely stored in the client machine.</li>
-                                            <li>Public Key: can be shared with the droplet to indicate that the client machine for that public key is safe to connect to.</li>
-                                        </ul>
-                                        <p>To generate an SSH Key Pair on your computer using the cryptography algorithm RSA,
-                                            you can simply run the following command in your terminal:</p>
-                                                <!--<p><img class="rounded" src="static/assets/img/project5/terminal-ssh.png" alt="Step 1"></p>-->
-                                    <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" >
-                                        <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ ssh-keygen -t rsa</span>
-                                                    <!--<span class="token function" style="color: rgb(215, 58, 73);">git</span> -->
-                                                    <!--<span class="token plain"> </span> -->
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    </div>
-                                    <p><br>The private key (id_rsa) and the public key (id_rsa.pub) will be available in the .ssh file by default.
-                                        Then it can be copied from your terminal by running the command below and pasted in the droplet window.</p>
-                                                                        <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" >
-                                        <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ cat ~/.ssh/id_rsa.pub</span>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <img class="rounded" src="static/assets/img/project5/terminal-ssh.png" alt="SSH">
-                                    <p><br>The rest of the configuration to create a droplet can be as it is.</p>
-                                    <li>Create Firewall rules</li>
-                                    <p>
-                                    Firewall configures the specific port where the server is accessible and this port is
-                                        always open to an application. In the Networking tab, we can configure the Port 22 and our <a hef="https://www.whatismyip.com/">IP address</a>
-                                        as our firewall inbound rule.
-                                        After that the communication is allowed and the SSH authentication will occur.</p>
-                                    <p><img class="rounded" src="static/assets/img/project5/firewall.png" alt="Firewall "></p>
-                                    <p>We need to assign that firewall rule to the droplet server we just created:</p>
-                                    <p><img class="rounded" src="static/assets/img/project5/droplet-firewall.png" alt="Firewall Droplet"></p>
-                                    <p>The server is accessible from your terminal by running the command (as a root user):</p>
-                                        <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ ssh root@[IP address of your droplet]</span>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    <br>
-                                    <li>Install java</li>
-                                    <p>Since the server is completely clean, we need to install Java (version 8) in
-                                        order to run our application: </p>
-                                        <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ apt get update</span><br>
-                                                        <span class="token plain">$ apt install openjdk-8-jre-headless</span>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    </ol>
-                                    <h4>Create and configure a new Linux user on the Droplet (Security best practice)</h4>
-                                    <p>Generally, when administering a server we should not run applications as a root user. The best practice is to create a user
-                                    for every application we run on that server and give it only the permission it needs to run that specific application.
-                                    <ol>
+                                        <li>Query Repositories</li>
+                                        <p>You can see list of repositories that the user created on Nexus has permissions to
+                                        access by using the code with the following endpoint:
+                                            <code>$ curl -u username:password -X GET 'http://167.99.138.11:8081/service/rest/v1/repositories'</code>.
+                                        <br><img class="rounded" src="static/assets/img/project6/query-repo.png" alt="Query repo"></p>
 
-                                    <h4>Deploy and run a Java Gradle application on Droplet</h4>
-                                    <p>Now we can copy a jar file that we are going to build locally to the remote Ubuntu server and
-                                        then run the app on that server. After that, the application can be accessed on the browser.</p>
-                                    <ol>
-                                        <li>Build a jar file with Gradle and secure copy it into the remote server</li>
-                                        <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ cd [project folder]</span><br>
-                                                        <span class="token plain">$ ./gradlew build</span><br>
-                                                        <span class="token plain">$ scp [file locally] root@[destination IP]/[destination path]</span><br>
-                                                        <span class="token plain">$ java -jar [project name] &</span><br>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                        <p><br>Then we can see the port in which the application server is listening at.
-                                        <li>Access it from a browser</li>
-                                         First we need to add a new inbound firewall rule opening that port from all sources:</p>
-                                        <p><img class="rounded" src="static/assets/img/project5/java-port.png" alt="Java-port "></p>
-                                        <p><img class="rounded" src="static/assets/img/project5/firewall-app.png" alt="Firewall App"></p>
-                                        <p>To access the UI of the application from a browser, just type the "IP address of the droplet:app port",
-                                            example "http://104.248.252.203:7071/".</p>
-                                        <p><img class="rounded" src="static/assets/img/project5/ui-app.png" alt="UI App"></p>
-                                        <p>We can see if the app is running on server and check which servers that have active internet connections with:</p>
-                                        <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ ps aux | grep java</span><br>
-                                                        <span class="token plain">$ netstat -lpnt</span><br>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                        <br>
-                                        <p><img class="rounded" src="static/assets/img/project5/netstat.png" alt="Netstat"></p>
+                                        <li>Query components of a repository</li>
+                                        <p>You can see all components of a specific repository for a user on Nexus by using the code <code>
+                                            $ curl -u username-password -X GET 'http://167.99.138.11:8081/service/rest/v1/components?repository=mave-snapshots'</code>.
+                                        <br><img class="rounded" src="static/assets/img/project6/query-components.png" alt="Query components"></p>
+
+                                        <li>Query assets of a component</li>
+                                        <p>You can see list of assets of a specific component by using the component´s ID in the code:
+                                            <code>$ curl -u flavia:9665 -X GET 'http://167.99.138.11:8081/service/rest/v1/components/[ID of component]'</code>.
+                                        <br></p>
                                     </ol>
 
-                                                                    <li>Create a linux application user</li>
-                                    If we need to escalate privileges for that user, by giving permissions to some sudo commands, then we run the second line below.
-                                    To switch to the user just created we run the third line:</p>
-                                    <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ adduser java</span><br>
-                                                        <span class="token plain">$ usermod -aG sudo java</span><br>
-                                                        <span class="token plain">$ su - java</span>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    <br>
-                                    <p><img class="rounded" src="static/assets/img/project5/java-user.png" alt="Java User"></p>
-                                    <li>Add SSH public key for the application user</li>
-                                    <p>This command should be run in a new terminal in order to copy your SSH public key.</p>
-                                    <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ cat ~/.ssh/id_rsa.pub </span><br>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    <p><br>Then you can go back to the terminal where you are logged in in the Ubuntu server
-                                        as an application user and paste your SSH public key in an appropriate file:</p>
-                                    <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ mkdir .ssh</span><br>
-                                                        <span class="token plain">$ sudo vim .ssh/authorized_keys</span><br>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    <p><br>To test it out, exit from the java user and from the root user.
-                                        Then log in as the new user created:</p>
-                                    <div class="codeBlockContent_biex">
-                                                <code class="codeBlockLines_e6Vv">
-                                                    <span class="token-line" style="color: rgb(57, 58, 52);">
-                                                        <span class="token plain">$ exit</span><br>
-                                                        <span class="token plain">$ exit</span><br>
-                                                        <span class="token plain">$ ssh java@[droplet IP address]</span><br>
-                                                    </span>
-                                                </code>
-                                        </div>
-                                    <p><br>You should then be able to login again.</p>
-                                    </ol>
-                                </div>
+
+
                             </div>
-                    <!--Share-->
-                            <div class="row justify-content-sm-center align-items-center py-3 mt-3">
-                                <div class="col-12 col-lg-8">
-                                    <div class="row">
-                                        <div class="col-9 col-md-6">
-                                            <h6 class="fw-bolder d-inline mb-0 me-3">Share:</h6>
-                                            <button class="btn me-2 btn-icon-only btn-pill bg-blue btn-linkedin d-inline" aria-label="linkedin social link"><span class="fab fa-linkedin fa-2x"></span></button>
-                                            <button class="btn btn-sm me-2 btn-icon-only btn-pill btn-twitter d-inline text-white" aria-label="twitter social link"><span class="fab fa-twitter"></span></button>
-                                            <button class="btn btn-sm btn-icon-only btn-pill bg-orange d-inline text-white" aria-label="reddit social link"><span class="fab fa-reddit-alien"></span></button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </article>
         </div>
