@@ -15,13 +15,13 @@
             <div class="row justify-content-center">
                 <div class="col-12 col-lg-10 text-center">
                     <div class="mb-4">
-                        <a href="#" class="badge bg-success text-uppercase me-2 px-3">Nexus</a>
-                        <a href="#" class="badge bg-success text-uppercase px-3">Artifact Repository Manager</a>
+                        <a href="#" class="badge bg-success text-uppercase me-2 px-3">Docker</a>
+                        <a href="#" class="badge bg-success text-uppercase px-3">Containers</a>
                     </div>
-                    <h1 class="display-3 mb-4 px-lg-5">Run Nexus on DigitalOcean and Publish Artifact to Nexus</h1>
+                    <h1 class="display-3 mb-4 px-lg-5">Use Docker for local development</h1>
                     <div class="post-meta">
                         <span class="fw-bold me-3">Flávia Santos</span>
-                        <span class="post-date me-3">6 April, 2023</span>
+                        <span class="post-date me-3">10 April, 2023</span>
                     </div>
                 </div>
                </div>
@@ -36,21 +36,46 @@
                     <!--Text-->
                             <div class="row justify-content-center">
                                 <div class="col-12 col-lg-8">
-                                    <p> Nexus is a popular open-source artifact repository manager that helps manage software artifacts,
-                                        dependencies, and binaries by providing a centralized platform to store, manage, and
-                                        distribute them across development teams,
-                                        making it an essential tool for software developers, DevOps, and software organizations.
-                                    Nexus is essential for companies that do not want to make their work available to the public.</p>
-                                    <p>In this project, we have used technologies such as Nexus, DigitalOcean, Linux, Java, Gradle,
-                                        and Maven. The goal of the project is to install and configure Nexus from scratch on a cloud
-                                        server and create a new user on Nexus with relevant permissions. Then, we will build a Java
-                                        Gradle Project and a Java Maven Project and upload the built jar files to Nexus.</p>
+                                    <p>This project showcases how to work with Docker containers when developing applications.
+                                    By using a very simple UI app using JavaScript and Node.js in the backend. In order to integrate
+                                    this in the database, we will use Docker container of a MondoDB database. To make it easy
+                                        we will also deploy a container og a MongoBD UI (Mongo Express), where we can see the database
+                                    structure and the updates that our app is doing in the database.</p>
                                     <h4>Technologies used:</h4>
                                     <ul>
-                                        <li>Nexus, DigitalOcean, Linux, Java, Gradle, Maven</li>
+                                        <li>Docker, Node.js, MongoDB, MongoExpress</li>
                                     </ul>
+                                    <h4>Setup the application locally</h4>
+                                    <p>1. Pull docker images for the database:<br>
+                                        <code>$    docker pull mongo</code><br>
+                                        <code>$    docker pull mongo-express</code>
+                                    <br>
+                                        <br>
+                                        2. Set up a docker network for the MongoDB and MongoExpress:<br>
+                                        <code>$   docker network create mongo-network </code><br><br>
+                                        <img class="rounded" src="static/assets/img/project7_1/mongo-network.png" alt="mongo-network"><br>
+                                        <br>
+                                        3. Overwrite the username and password variables and run mongo containers. <br>
+                                        <code>$ docker run -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=password --name mongodb --net mongo-network mongo</code><br>
+                                        <br><code>$ docker run -d -p 8081:8081 -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=password --net mongo-network --name mongo-express -e ME_CONFIG_MONGODB_SERVER=mongodb mongo-express</code>
+                                        <br>
+                                        <br>4. Then access the mongo UI and create a "user-account" database and a "users" collection.<br>
+                                        <img class="rounded" src="static/assets/img/project7_1/mongo-user.png" alt="mongo-user"><br>
+                                        <img class="rounded" src="static/assets/img/project7_1/users-collection.png" alt="users-collection"><br><br>
+                                        We can now update the profile and see the input in the database:
+                                        <br><img class="rounded" src="static/assets/img/project7_1/update.png" alt="update">
+                                        <br>
 
-                                    <h4>Install and configure Nexus from scratch on a cloud server</h4>
+
+                                    </p>
+                                    <h4>Create Dockerfile for Nodejs application and build Docker image</h4>
+                                    <p></p>
+
+
+                                    <h4>Run Nodejs application in Docker container and connect to MongoDB database container locally</h4>
+                                    <h4>Also run MongoExpress container as a UI of the MongoDB database.</h4>
+
+----------------------------------------------------
                                     <p>To install and configure Nexus on a DigitalOcean Droplet, we followed the official
                                         Nexus installation guide. We created a new Droplet with Ubuntu, logged in to
                                         the Droplet via SSH, following the similar approach as the project
