@@ -2,10 +2,8 @@
 
 ![Docker](img/docker.png "OS & Linux Basics Module")
 
-**Commands used:**
-
 <details>
-<summary>Basic Linux Commands (CLI - Part 2)</summary>
+<summary>Commands Used</summary>
 <br />
 
 Containers vs Images
@@ -26,7 +24,9 @@ Docker main commands
 Docker Debug
 - `docker logs [container ID/cantainer name]`
 - `docker run -d -p6001:6379 --name redis-older redis:6.2`= give a name to a container
-- `docker exec -it [container ID/ container name] /bin/bash` = access interactively the terminal of that container. You see that the cursor change to "root@[container ID]:/data#". There you can check your virtual file system ($ cd /; ls); check if all environmental variables are set correctly ($ env).`
+- `docker exec -it [container ID/ container name] /bin/bash` = access interactively (with bash or sh) the terminal of that container. 
+You see that the cursor change to "root@[container ID]:/data#". 
+There you can check your virtual file system ($ cd /; ls); check if all environmental variables are set correctly ($ env).`
 -  - `exit` = exit the docker terminal
 
 Simplified Docker workflow
@@ -40,6 +40,9 @@ Demos
 - `docker logs 33421c44c232 | tail`
 - `docker logs 33421c44c232 -f` = string the logs while you make changes to the app
 
-
+Dockerfile
+- `docker build -t my-app:1.0 .` - build an image with a tag "my-app:1.0" and uses the current directory ( . ) as build context
+- `docker -rm [container ID]` - delete a container that is not running
+- `docker -rmi [image ID]` - delete the image
 
 </details>

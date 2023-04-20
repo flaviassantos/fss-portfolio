@@ -15,10 +15,10 @@
             <div class="row justify-content-center">
                 <div class="col-12 col-lg-10 text-center">
                     <div class="mb-4">
-                        <a href="#" class="badge bg-success text-uppercase me-2 px-3">Docker</a>
-                        <a href="#" class="badge bg-success text-uppercase px-3">Containers</a>
+                        <a href="#" class="badge bg-success text-uppercase me-2 px-3">CI/CD</a>
+                        <a href="#" class="badge bg-success text-uppercase px-3">Jenkins</a>
                     </div>
-                    <h1 class="display-3 mb-4 px-lg-5">Containers with Docker</h1>
+                    <h1 class="display-3 mb-4 px-lg-5">Build Automation & CI/CD with Jenkins</h1>
                     <div class="post-meta">
                         <span class="fw-bold me-3">Flávia Santos</span>
                         <span class="post-date me-3">10 April, 2023</span>
@@ -117,35 +117,19 @@
                                         and check the image created with <code>$ docker image</code>. Run your image:</p>
                                     <img class="rounded" src="static/assets/img/project7_1/app-running.png" alt="app-running"><br><br>
                                     <p>3.2. Create private Docker registry on AWS (Amazon ECR)</p>
-                                    <p>
-                                        <img class="rounded" src="static/assets/img/project7_1/repository.png" alt="repository"><br><br>
-                                    </p>
+                                    <p></p>
                                     <p>3.3. Push Docker image to this private repository</p>
-                                    <p>After logging in to the private registry (Docker login), we can use the push commands in
-                                        order to successfully:<br>
-                                        - Tagg the Docker Image in order to rename them with the correct path to the private repository created<br>
-                                        - Push the Docker Image to AWS ECR repository<br><br>
-                                    <img class="rounded" src="static/assets/img/project7_1/push-commands.png" alt="push-commands"><br><br>
-                                        <img class="rounded" src="static/assets/img/project7_1/images-pushed.png" alt="images-pushed"><br><br></p>
 
-                                    <h4>4. Simulate how to deploy Docker application on a server with Docker Compose</h4>
-                                    <p>
-                                        First we change the mongodb server url from localhost to mongodb service name
-                                        in Node Code: <code>let mongoUrlDockerCompose = "mongodb://admin:password@mongodb";</code>.<br><br>
-                                        <img class="rounded" src="static/assets/img/project7_1/mongo-client.png" alt="mongo-client"><br><br>
-                                    Then we add our example application to a Docker-compose file and then run it locally with the
-                                        command <code>$ docker compose -f mongo.yaml up</code>:<br><br>
-                                         <img class="rounded" src="static/assets/img/project7_1/compose-file.png" alt="compose-file"><br><br>
+                                    <h4>4. Deploy Docker application on a server with Docker Compose</h4>
+                                    <p>4.1. Copy Docker-compose file to remote server</p>
+                                    <p>4.2. Login to private Docker registry on remote server to fetch our app image
+                                    <p>4.3. Start our application container with MongoDB and MongoExpress services using docker compose</p>
 
                                     <h4>5. Persist data with Docker Volumes</h4>
-                                    <p>In order to persist data of a MongoDB container we attach a Docker volume to it. We need to map
-                                    the default database path for MongoDB (/data/db directory) inside a container
-                                        to our volume in the host computer.
-                                        It can be checked by running <code>$ docker exec -it [mongodb container id] sh; ls /data/db</code>.</p><br>
-                                    <img class="rounded" src="static/assets/img/project7_1/dockercompose-volumes.png" alt="dockercompose-volumes"><br><br>
-                                    <p>Then we can restart the container:<br><code>$ docker compose -f docker-compose.yaml down</code>
-                                        <br><code>$ docker compose -f docker-compose.yaml up</code>
-                                        <br>and create the database to test it.</p>
+                                    <p>5.1. Persist data of a MongoDB container by attaching a Docker volume to it</p>
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
 
                                     <h4>6. Create Docker repository on Nexus and push to it</h4>
                                     <p>6.1. Create Docker hosted repository on Nexus</p>
